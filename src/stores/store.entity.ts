@@ -1,5 +1,5 @@
 // src/stores/store.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 import { Book } from '../books/book.entity';
 
 @Entity()
@@ -13,6 +13,6 @@ export class Store {
     @Column()
     location: string;
 
-    @OneToMany(() => Book, (book) => book.store)
+    @ManyToMany(() => Book, (book) => book.stores)
     books: Book[];
 }

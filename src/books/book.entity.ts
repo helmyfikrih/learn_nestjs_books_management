@@ -1,5 +1,5 @@
 // src/books/book.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Store } from '../stores/store.entity';
 
 @Entity()
@@ -16,6 +16,7 @@ export class Book {
     @Column()
     year: number;
 
-    @ManyToOne(() => Store, (store) => store.books)
-    store: Store;
+    @ManyToMany(() => Store, (store) => store.books)
+    @JoinTable() // Menentukan tabel pivot
+    stores: Store[];
 }

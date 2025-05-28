@@ -17,12 +17,18 @@ export class BooksService {
     ) { }
 
     async create(createBookDto: CreateBookDto): Promise<Book> {
-        const { storeId, ...bookData } = createBookDto;
-        const store = await this.storeRepository.findOneBy({ id: storeId });
-        if (!store) {
-            throw new NotFoundException(`Store with ID ${storeId} not found`);
+        const { storeIds, ...bookData } = createBookDto;
+        // Validasi storeIds
+        const stores = await this.storeRepository.findByIds(storeIds);
+        if (stores.length !== storeIds.length) {
+            const foundIds = stores.map((store) => store.id);
+            const missingIds = storeIds.filter((id) => !foundIds.includes(id));
+            throw new NotFoundException(`Stores with IDs ${missingIds.join(', ')} not found`);
         }
-        const book = this.bookRepository.create({ ...bookData, store });
+        const book = this.bookRepository.create({
+            ...bookData,
+            stores, // Assign stores ke relasi
+        });
         return this.bookRepository.save(book);
     }
 
@@ -45,8 +51,9 @@ export class BooksService {
             throw new BadRequestException('Invalid pagination parameters');
         }
 
-        const queryBuilder = this.bookRepository.createQueryBuilder('book')
-            .leftJoinAndSelect('book.store', 'store') // Join dengan Store
+        const queryBuilder = this.bookRepository
+            .createQueryBuilder('book')
+            .leftJoinAndSelect('book.stores', 'store') // Join dengan stores (many-to-many)
             .skip(skip)
             .take(limit);
 
@@ -84,7 +91,7 @@ export class BooksService {
     async findOne(id: number): Promise<Book> {
         const book = await this.bookRepository
             .createQueryBuilder('book')
-            .leftJoinAndSelect('book.store', 'store')
+            .leftJoinAndSelect('book.stores', 'store')
             .where('book.id = :id', { id })
             .getOne();
         if (!book) {
@@ -95,13 +102,17 @@ export class BooksService {
 
     async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {
         const book = await this.findOne(id);
-        if (updateBookDto.storeId) {
-            const store = await this.storeRepository.findOneBy({ id: updateBookDto.storeId });
-            if (!store) {
-                throw new NotFoundException(`Store with ID ${updateBookDto.storeId} not found`);
+
+        if (updateBookDto.storeIds) {
+            const stores = await this.storeRepository.findByIds(updateBookDto.storeIds);
+            if (stores.length !== updateBookDto.storeIds.length) {
+                const foundIds = stores.map((store) => store.id);
+                const missingIds = updateBookDto.storeIds.filter((id) => !foundIds.includes(id));
+                throw new NotFoundException(`Stores with IDs ${missingIds.join(', ')} not found`);
             }
-            book.store = store;
+            book.stores = stores;
         }
+
         Object.assign(book, updateBookDto);
         return this.bookRepository.save(book);
     }
