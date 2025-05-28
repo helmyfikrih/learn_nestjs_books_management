@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { PaginationDto } from './dto/pagination.dto';
 import { Book } from './book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,8 +18,39 @@ export class BooksService {
         return this.bookRepository.save(book);
     }
 
-    async findAll(): Promise<Book[]> {
-        return this.bookRepository.find();
+    async findAll(paginationDto: PaginationDto): Promise<{
+        data: Book[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> {
+        const { page = 1, limit = 2 } = paginationDto;
+
+        // Validasi bahwa page dan limit adalah number dan tidak NaN
+        if (isNaN(page) || isNaN(limit)) {
+            throw new BadRequestException('Page and limit must be valid numbers');
+        }
+
+        const skip = (page - 1) * limit;
+
+        // Pastikan skip adalah number positif
+        if (skip < 0 || isNaN(skip)) {
+            throw new BadRequestException('Invalid pagination parameters');
+        }
+
+        const [data, total] = await this.bookRepository.findAndCount({
+            skip,
+            take: limit,
+        });
+
+        return {
+            data,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 
     async findOne(id: number): Promise<Book> {

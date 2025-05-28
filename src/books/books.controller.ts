@@ -1,8 +1,9 @@
 // src/books/books.controller.ts
-import { Controller, Get, Post, Put, Delete, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, NotFoundException } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { PaginationDto } from './dto/pagination.dto';
 import { Book } from './book.entity';
 
 @Controller('books')
@@ -15,9 +16,14 @@ export class BooksController {
     }
 
     @Get()
-    findAll(): Promise<Book[]> {
-        // console.log('Fetching all books...'); // Tambahkan log
-        return this.booksService.findAll();
+    findAll(@Query() paginationDto: PaginationDto): Promise<{
+        data: Book[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> {
+        return this.booksService.findAll(paginationDto);
     }
 
     @Get(':id')
