@@ -19,7 +19,10 @@ export class StoresService {
     }
 
     async findAll(): Promise<Store[]> {
-        return this.storeRepository.find();
+        return this.storeRepository
+            .createQueryBuilder('store')
+            .leftJoinAndSelect('store.books', 'book')
+            .getMany();
     }
 
     async findOne(id: number): Promise<Store> {

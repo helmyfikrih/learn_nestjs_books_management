@@ -18,12 +18,15 @@ export class BooksService {
 
     async create(createBookDto: CreateBookDto): Promise<Book> {
         const { storeIds, ...bookData } = createBookDto;
-        // Validasi storeIds
-        const stores = await this.storeRepository.findByIds(storeIds);
-        if (stores.length !== storeIds.length) {
-            const foundIds = stores.map((store) => store.id);
-            const missingIds = storeIds.filter((id) => !foundIds.includes(id));
-            throw new NotFoundException(`Stores with IDs ${missingIds.join(', ')} not found`);
+        let stores = [];
+        if (storeIds && storeIds.length > 0) {
+            // Validasi storeIds
+            const stores = await this.storeRepository.findByIds(storeIds);
+            if (stores.length !== storeIds.length) {
+                const foundIds = stores.map((store) => store.id);
+                const missingIds = storeIds.filter((id) => !foundIds.includes(id));
+                throw new NotFoundException(`Stores with IDs ${missingIds.join(', ')} not found`);
+            }
         }
         const book = this.bookRepository.create({
             ...bookData,
