@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BooksModule } from './books/books.module';
 import { StoresModule } from './stores/stores.module';
 import { typeOrmConfig } from './config/database_config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { typeOrmConfig } from './config/database_config';
     }),
     BooksModule,
     StoresModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
