@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { StoreWithBooksDto } from './dto/store-with-books.dto';
 import { Store } from './entities/store.entity';
 
 @Injectable()
@@ -47,4 +48,14 @@ export class StoresService {
         const store = await this.findOne(id);
         await this.storeRepository.remove(store);
     }
+
+    async getStoreWithTotalBooks(id: number): Promise<StoreWithBooksDto> {
+        const store = await this.findOne(id);
+
+        return {
+            ...store,
+            totalBooks: store.books.length,
+        };
+    }
+
 }
