@@ -1,5 +1,5 @@
 // src/books/dto/create-book.dto.ts
-import { IsString, IsInt, Min, Max } from 'class-validator';
+import { IsString, IsInt, Min, Max, IsNumber } from 'class-validator';
 
 export class CreateBookDto {
   @IsString()
@@ -12,4 +12,7 @@ export class CreateBookDto {
   @Min(1800)
   @Max(2025)
   year: number;
+
+  @IsNumber()
+  storeId: number; // ID toko yang terkait
 }

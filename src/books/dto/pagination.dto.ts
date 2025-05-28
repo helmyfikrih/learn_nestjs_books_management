@@ -1,5 +1,5 @@
 // src/books/dto/pagination.dto.ts
-import { IsInt, Min, Max, IsOptional } from 'class-validator';
+import { IsInt, Min, Max, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class PaginationDto {
@@ -15,4 +15,27 @@ export class PaginationDto {
     @Min(1)
     @Max(10)
     limit: number = 2;
+
+    @IsOptional()
+    @IsString()
+    storeName?: string;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    year?: number;
+
+    @IsOptional()
+    @IsString()
+    storeLocation?: string;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    minYear?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    maxYear?: number;
 }

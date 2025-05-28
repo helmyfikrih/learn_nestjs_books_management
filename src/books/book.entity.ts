@@ -1,5 +1,6 @@
 // src/books/book.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Store } from '../stores/store.entity';
 
 @Entity()
 export class Book {
@@ -14,4 +15,7 @@ export class Book {
 
     @Column()
     year: number;
+
+    @ManyToOne(() => Store, (store) => store.books)
+    store: Store;
 }
