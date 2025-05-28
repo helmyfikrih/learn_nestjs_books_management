@@ -3,6 +3,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common'
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { StoreWithBooksDto } from './dto/store-with-books.dto';
 import { Store } from './entities/store.entity';
 
 @Controller('stores')
@@ -20,8 +21,12 @@ export class StoresController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string): Promise<Store> {
-        return this.storesService.findOne(+id);
+    async findOne(@Param('id') id: string): Promise<StoreWithBooksDto> {
+        const store = await this.storesService.findOne(+id); // Wajib pakai await dulu!
+        return {
+            ...store,
+            totalBooks: store.books.length,
+        };
     }
 
     @Put(':id')

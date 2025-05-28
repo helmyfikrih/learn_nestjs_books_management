@@ -26,7 +26,11 @@ export class StoresService {
     }
 
     async findOne(id: number): Promise<Store> {
-        const store = await this.storeRepository.findOneBy({ id });
+        const store = await this.storeRepository
+            .createQueryBuilder('store')
+            .leftJoinAndSelect('store.books', 'book')
+            .where('store.id = :id', { id })
+            .getOne();
         if (!store) {
             throw new NotFoundException(`Store with ID ${id} not found`);
         }
