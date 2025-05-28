@@ -2,10 +2,10 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PaginationDto } from './dto/pagination.dto';
-import { Book } from './book.entity';
+import { Book } from './entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Store } from '../stores/store.entity'; // Tambahkan impor ini
+import { Store } from '../stores/entities/store.entity'; // Tambahkan impor ini
 
 @Injectable()
 export class BooksService {

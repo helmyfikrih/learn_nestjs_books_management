@@ -1,6 +1,6 @@
 // src/stores/store.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import { Book } from '../books/book.entity';
+import { Book } from '../../books/entities/book.entity';
 
 @Entity()
 export class Store {

@@ -3,7 +3,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common'
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
-import { Store } from './store.entity';
+import { Store } from './entities/store.entity';
 
 @Controller('stores')
 export class StoresController {
