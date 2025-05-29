@@ -8,6 +8,7 @@ import { Role } from './enum/role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { TokenPayload } from './interfaces/token-payload.interface';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -81,6 +82,40 @@ export class AuthService {
     }
 
     async login(user: any) {
+        const tokenPayload: TokenPayload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        };
+        return {
+            access_token: await this.jwtService.signAsync(tokenPayload)
+        }
+    }
+
+    async googleValidateUser(payload: any): Promise<any> {
+        const { email, firstName, lastName, picture } = payload;
+
+        // Cari user berdasarkan email
+        let user = await this.userRepository.findOne({ where: { email } });
+
+        if (!user) {
+            // Generate random password
+            const randomPassword = randomBytes(12).toString('hex').slice(0, 12);
+            const hashPassword = await bcrypt.hash(randomPassword, 10);
+
+            // Buat DTO untuk user baru
+            const registerDto: RegisterDto = {
+                email,
+                name: `${firstName} ${lastName || ''}`.trim(), // Gabungkan firstName dan lastName
+                password: hashPassword,
+                role: Role.USER,
+            };
+
+            // Buat dan simpan user baru
+            user = this.userRepository.create(registerDto);
+            await this.userRepository.save(user);
+        }
+
         const tokenPayload: TokenPayload = {
             id: user.id,
             email: user.email,

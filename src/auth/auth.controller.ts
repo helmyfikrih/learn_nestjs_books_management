@@ -9,7 +9,10 @@ import { Roles } from './decorators/roles.decorator';
 import { Role } from './enum/role.enum';
 import { LocalAuthGuard } from './guard/local.guard';
 import { Public } from './decorators/public.decorator';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GoogleOauthGuard } from './guard/google.guard';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 
@@ -33,16 +36,21 @@ export class AuthController {
     @Public()
     @UseGuards(LocalAuthGuard)
     @Post('login')
+    @ApiOperation({ summary: 'Login user' })
+    @ApiBody({ type: LoginDto }) // ← dokumentasi input body
+    @ApiResponse({ status: 200, description: 'Login berhasil dan mengembalikan JWT' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
     async login(@Request() req: Express.Request) {
         return this.authService.login(req.user);
     }
 
 
-    @Get('getUser')
-    async getUser(@Request() request): Promise<User | null> {
-        return await this.authService.getUser(request.user.id)
-    }
+    // @Get('getUser')
+    // async getUser(@Request() request): Promise<User | null> {
+    //     return await this.authService.getUser(request.user.id)
+    // }
 
+    @ApiBearerAuth()
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Get('test')
@@ -50,5 +58,24 @@ export class AuthController {
         return {
             message: "Test role guard berhasil"
         }
+    }
+
+    @Public()
+    @Get('google')
+    @UseGuards(GoogleOauthGuard)
+    async googleAuth(@Request() req) {
+        // Memulai flow autentikasi Google
+    }
+
+    @Public()
+    @Get('google/callback')
+    @UseGuards(GoogleOauthGuard)
+    async googleAuthRedirect(@Request() req) {
+        // Callback setelah user login dengan Google
+        return await this.authService.googleValidateUser(req.user)
+        return {
+            message: 'User logged in successfully',
+            user: req.user,
+        };
     }
 }
