@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { Role } from './enum/role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { TokenPayload } from './interfaces/token-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -51,20 +52,43 @@ export class AuthService {
         if (!await bcrypt.compare(loginDto.password, user.password)) {
             throw new UnauthorizedException("Invalid Credentials")
         }
-        
-        const payload = {id: user.id, email:user.email, role: user.role}
-        console.log(payload)
+
+        const tokenPayload: TokenPayload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        };
         return {
-            access_token: await this.jwtService.signAsync(payload)
+            access_token: await this.jwtService.signAsync(tokenPayload)
         }
     }
 
-    async getUser(id: string): Promise<User|null> {
-        const user = await this.userRepository.findOneBy({id})
-        if(user?.password) {
+    async getUser(id: string): Promise<User | null> {
+        const user = await this.userRepository.findOneBy({ id })
+        if (user?.password) {
             user.password = "************"
         }
         return user
+    }
+
+    async validateUser(loginDto: LoginDto): Promise<any> {
+        const user = await this.userRepository.findOne({ where: { email: loginDto.email } })
+        if (user && await bcrypt.compare(loginDto.password, user.password)) {
+            const { password, ...result } = user;
+            return result;
+        }
+        return null;
+    }
+
+    async login(user: any) {
+        const tokenPayload: TokenPayload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        };
+        return {
+            access_token: await this.jwtService.signAsync(tokenPayload)
+        }
     }
 
 }

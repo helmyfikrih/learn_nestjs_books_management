@@ -7,6 +7,10 @@ import { StoresModule } from './stores/stores.module';
 import { typeOrmConfig } from './config/database_config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AppService } from './app.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guard/jwt.guard';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -27,5 +31,12 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
   ],
+  controllers: [AppController],
+  providers: [
+    AppService, {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    }
+  ]
 })
 export class AppModule { }
