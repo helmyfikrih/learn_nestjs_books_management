@@ -6,6 +6,8 @@ import { Book } from './entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Store } from '../stores/entities/store.entity'; // Tambahkan impor ini
+import { generatePaginationMeta } from 'src/common/utils/pagination-meta.util';
+import { getPaginationParams } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class BooksService {
@@ -37,35 +39,21 @@ export class BooksService {
 
     async findAll(paginationDto: PaginationDto): Promise<{
         data: Book[];
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
+        meta: ReturnType<typeof generatePaginationMeta>;
     }> {
-        const { page = 1, limit = 2, storeName, year, storeLocation, minYear, maxYear } = paginationDto;
-
-        if (isNaN(page) || isNaN(limit)) {
-            throw new BadRequestException('Page and limit must be valid numbers');
-        }
-
-        const skip = (page - 1) * limit;
-
-        if (skip < 0 || isNaN(skip)) {
-            throw new BadRequestException('Invalid pagination parameters');
-        }
+        const { storeName, year, storeLocation, minYear, maxYear } = paginationDto;
+        const { page, limit, skip } = getPaginationParams(paginationDto.page, paginationDto.limit);
 
         const queryBuilder = this.bookRepository
             .createQueryBuilder('book')
-            .leftJoinAndSelect('book.stores', 'store') // Join dengan stores (many-to-many)
+            .leftJoinAndSelect('book.stores', 'store')
             .skip(skip)
             .take(limit);
 
-        // Filter berdasarkan nama toko
         if (storeName) {
             queryBuilder.andWhere('store.name ILIKE :storeName', { storeName: `%${storeName}%` });
         }
 
-        // Filter berdasarkan tahun
         if (year) {
             queryBuilder.andWhere('book.year = :year', { year });
         }
@@ -73,9 +61,11 @@ export class BooksService {
         if (storeLocation) {
             queryBuilder.andWhere('store.location ILIKE :storeLocation', { storeLocation: `%${storeLocation}%` });
         }
+
         if (minYear) {
             queryBuilder.andWhere('book.year >= :minYear', { minYear });
         }
+
         if (maxYear) {
             queryBuilder.andWhere('book.year <= :maxYear', { maxYear });
         }
@@ -84,10 +74,7 @@ export class BooksService {
 
         return {
             data,
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
+            meta: generatePaginationMeta(total, page, limit),
         };
     }
 

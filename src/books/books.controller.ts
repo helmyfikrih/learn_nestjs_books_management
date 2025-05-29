@@ -5,6 +5,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { Book } from './entities/book.entity';
+import { generatePaginationMeta } from 'src/common/utils/pagination-meta.util';
 
 @Controller('books')
 export class BooksController {
@@ -18,10 +19,7 @@ export class BooksController {
     @Get()
     findAll(@Query() paginationDto: PaginationDto): Promise<{
         data: Book[];
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
+        meta: ReturnType<typeof generatePaginationMeta>;
     }> {
         return this.booksService.findAll(paginationDto);
     }
