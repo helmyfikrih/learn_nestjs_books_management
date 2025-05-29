@@ -6,6 +6,7 @@ import { BooksModule } from './books/books.module';
 import { StoresModule } from './stores/stores.module';
 import { typeOrmConfig } from './config/database_config';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
     BooksModule,
     StoresModule,
     AuthModule,
+    UsersModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
