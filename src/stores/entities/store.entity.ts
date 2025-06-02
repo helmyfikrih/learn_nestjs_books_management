@@ -4,8 +4,8 @@ import { Book } from '../../books/entities/book.entity';
 
 @Entity()
 export class Store {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column()
     name: string;
