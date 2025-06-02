@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from 'src/auth/entities/user.entity';
 import { RolesGuard } from 'src/auth/guard/role.guard';
@@ -7,6 +7,8 @@ import { Role } from 'src/auth/enum/role.enum';
 import { generatePaginationMeta } from 'src/common/utils/pagination-meta.util';
 import { UserFilterDTO } from './dto/user-flter.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { FindOneParamsDTO } from './dto/findOne-params.dto';
+import { UpdateRoleDTO } from './dto/update-role.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -31,4 +33,22 @@ export class UsersController {
     }> {
     return this.usersService.findAllUser(userFilterDTO)
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch('/:id')
+  async update(@Param() params: FindOneParamsDTO, @Body() updateRoleDTO: UpdateRoleDTO): Promise<User> {
+    const userData = await this.findOneOrFail(params.id)
+    return await this.usersService.updateRoleUser(userData, updateRoleDTO);
+  }
+
+  private async findOneOrFail(id: string): Promise<User> {
+    const user = await this.usersService.findByParams(id)
+    if (!user) {
+      throw new NotFoundException()
+    }
+
+    return user
+  }
+
 }

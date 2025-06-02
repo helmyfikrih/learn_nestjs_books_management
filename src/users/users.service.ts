@@ -5,6 +5,7 @@ import { generatePaginationMeta } from 'src/common/utils/pagination-meta.util';
 import { getPaginationParams } from 'src/common/utils/pagination.util';
 import { Repository } from 'typeorm';
 import { UserFilterDTO } from './dto/user-flter.dto';
+import { UpdateRoleDTO } from './dto/update-role.dto';
 
 @Injectable()
 export class UsersService {
@@ -45,5 +46,14 @@ export class UsersService {
             data,
             meta: generatePaginationMeta(total, page, limit),
         };
+    }
+
+    async findByParams(id: string): Promise<User | null> {
+        return await this.userRepository.findOneBy({ id })
+    }
+
+    async updateRoleUser(user: User, updateRoleDTO: UpdateRoleDTO): Promise<User> {
+        Object.assign(user, updateRoleDTO);
+        return await this.userRepository.save(user);
     }
 }
