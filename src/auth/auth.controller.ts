@@ -20,6 +20,8 @@ export class AuthController {
 
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Public()
     @Post('register')
     async register(@Body() registerDto: RegisterDto) {
         return await this.authService.registerUser(registerDto)
