@@ -1,19 +1,17 @@
-// src/books/book.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Store } from '../../stores/entities/store.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn, OneToOne } from 'typeorm';
 import { Role } from '../enum/role.enum';
-
+import { Profile } from 'src/profile/entities/profile.entity';
 @Entity()
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({unique: true})
+    @Column({ unique: true })
     email: string;
-    
+
     @Column()
     name: string;
-    
+
     @Column()
     password: string;
 
@@ -24,10 +22,13 @@ export class User {
     })
     role: Role;
 
+    @OneToOne(() => Profile, (profile) => profile.user)
+    profile: Profile
+
     @CreateDateColumn()
     createdAt: Date
 
     @UpdateDateColumn()
     updatedAt: Date
-   
+
 }

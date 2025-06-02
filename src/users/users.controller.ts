@@ -37,9 +37,12 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Patch('/:id')
-  async update(@Param() params: FindOneParamsDTO, @Body() updateRoleDTO: UpdateRoleDTO): Promise<User> {
+  async update(@Param() params: FindOneParamsDTO, @Body() updateRoleDTO: UpdateRoleDTO): Promise<{ message: string }> {
     const userData = await this.findOneOrFail(params.id)
-    return await this.usersService.updateRoleUser(userData, updateRoleDTO);
+    await this.usersService.updateRoleUser(userData, updateRoleDTO);
+    return {
+      message: "Role berhasil diubah"
+    }
   }
 
   private async findOneOrFail(id: string): Promise<User> {

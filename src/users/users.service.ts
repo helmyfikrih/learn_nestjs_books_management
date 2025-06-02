@@ -25,6 +25,7 @@ export class UsersService {
 
         const queryBuilder = this.userRepository
             .createQueryBuilder('user')
+            .select(['user.id', 'user.name', 'user.email'])
             .skip(skip)
             .take(limit);
 
@@ -52,8 +53,12 @@ export class UsersService {
         return await this.userRepository.findOneBy({ id })
     }
 
-    async updateRoleUser(user: User, updateRoleDTO: UpdateRoleDTO): Promise<User> {
+    async updateRoleUser(user: User, updateRoleDTO: UpdateRoleDTO): Promise<{ message: string }> {
         Object.assign(user, updateRoleDTO);
-        return await this.userRepository.save(user);
+        await this.userRepository.save(user);
+
+        return {
+            message: "update role berhasil."
+        }
     }
 }
