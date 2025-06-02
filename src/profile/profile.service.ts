@@ -20,7 +20,7 @@ export class ProfileService {
         if (!user) {
             throw new NotFoundException("user tidak ditemukan")
         }
-
+        console.log(user.profile)
         if (user.profile) {
             Object.assign(user.profile, createOrUpdateProfileDTO)
             await this.profileRepository.save(user.profile)
@@ -35,5 +35,25 @@ export class ProfileService {
                 message: "berhasil membuat profile"
             }
         }
+    }
+
+    async getUserProfileByToken(userId: string): Promise<User | null> {
+        const userProfile = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: ['profile'],
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                profile: {
+                    age: true,
+                    bio: true,
+                },
+                role: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        })
+        return userProfile
     }
 }

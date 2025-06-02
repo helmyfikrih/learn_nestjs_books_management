@@ -3,8 +3,8 @@ import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne } from 'ty
 
 @Entity()
 export class Profile {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column()
     age: number;
