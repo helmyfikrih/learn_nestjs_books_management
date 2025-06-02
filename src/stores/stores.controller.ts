@@ -22,16 +22,16 @@ export class StoresController {
 
     @Get(':id')
     findOne(@Param('id') id: string): Promise<StoreWithBooksDto> {
-        return this.storesService.getStoreWithTotalBooks(+id);
+        return this.storesService.getStoreWithTotalBooks(id);
     }
 
     @Put(':id')
     update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto): Promise<Store> {
-        return this.storesService.update(+id, updateStoreDto);
+        return this.storesService.update(id, updateStoreDto);
     }
 
     @Delete(':id')
     remove(@Param('id') id: string): Promise<void> {
-        return this.storesService.remove(+id);
+        return this.storesService.remove(id);
     }
 }

@@ -26,7 +26,7 @@ export class StoresService {
             .getMany();
     }
 
-    async findOne(id: number): Promise<Store> {
+    async findOne(id: string): Promise<Store> {
         const store = await this.storeRepository
             .createQueryBuilder('store')
             .leftJoinAndSelect('store.books', 'book')
@@ -38,18 +38,18 @@ export class StoresService {
         return store;
     }
 
-    async update(id: number, updateStoreDto: UpdateStoreDto): Promise<Store> {
+    async update(id: string, updateStoreDto: UpdateStoreDto): Promise<Store> {
         const store = await this.findOne(id);
         Object.assign(store, updateStoreDto);
         return this.storeRepository.save(store);
     }
 
-    async remove(id: number): Promise<void> {
+    async remove(id: string): Promise<void> {
         const store = await this.findOne(id);
         await this.storeRepository.remove(store);
     }
 
-    async getStoreWithTotalBooks(id: number): Promise<StoreWithBooksDto> {
+    async getStoreWithTotalBooks(id: string): Promise<StoreWithBooksDto> {
         const store = await this.findOne(id);
 
         return {

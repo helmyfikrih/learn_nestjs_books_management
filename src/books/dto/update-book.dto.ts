@@ -1,5 +1,5 @@
 // src/books/dto/update-book.dto.ts
-import { IsString, IsInt, Min, Max, IsOptional, IsNumber, IsArray } from 'class-validator';
+import { IsString, IsInt, Min, Max, IsOptional, IsArray, IsUUID } from 'class-validator';
 
 export class UpdateBookDto {
   @IsString()
@@ -17,7 +17,7 @@ export class UpdateBookDto {
   year?: number;
 
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsUUID('4', { each: true }) // Versi UUID v4
   @IsOptional()
-  storeIds?: number[];
+  storeIds?: string[];
 }

@@ -90,14 +90,14 @@ export class BooksService {
         return book;
     }
 
-    async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {
-        const book = await this.findOne(id);
+    async update(bookId: number, updateBookDto: UpdateBookDto): Promise<Book> {
+        const book = await this.findOne(bookId);
 
         if (updateBookDto.storeIds) {
             const stores = await this.storeRepository.findByIds(updateBookDto.storeIds);
             if (stores.length !== updateBookDto.storeIds.length) {
                 const foundIds = stores.map((store) => store.id);
-                const missingIds = updateBookDto.storeIds.filter((id) => !foundIds.includes(id));
+                const missingIds = updateBookDto.storeIds.filter((bookId) => !foundIds.includes(bookId));
                 throw new NotFoundException(`Stores with IDs ${missingIds.join(', ')} not found`);
             }
             book.stores = stores;
